@@ -25,17 +25,19 @@ services:
       - 7946/udp
     environment:
       - DATABASE=postgres
+      - SERVICE_NAME=kong
 
   consul:
     image: progrium/consul
     command: -server -bootstrap -ui-dir /ui
+    ports:
+      - 8500:8500
     expose:
       - 8300
       - 8301/udp
       - 8400
       - 8600
       - 8600/udp
-      - 8500
 
   registrator:
     image: gliderlabs/registrator
@@ -58,5 +60,4 @@ services:
       - 8443:8443
       - 8001:8001
     environment:
-      - APP_NAME=kong-8000
       - CONSUL_URL=consul:8500
