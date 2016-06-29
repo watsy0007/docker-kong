@@ -1,25 +1,56 @@
-upstream kong-8000 {
-    least_conn;
-    {{range service "kong"}}
-    server {{.Address}}:8000 max_fails=3 fail_timeout=60 weight=1;{{end}}
+user nginx;
+worker_processes auto;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
 }
 
-upstream kong-8001 {
-    least_conn;
-    {{range service "kong"}}
-    server {{.Address}}:8001 max_fails=3 fail_timeout=60 weight=1;{{end}}
-}
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    charset UTF-8;
 
-server {
-	listen 8000;
-	location / {
-        proxy_pass http://kong-8000;
+    upstream kong-8000 {
+        least_conn;
+        {{range service "kong"}}
+        server {{.Address}}:8000 max_fails=3 fail_timeout=60 weight=1;{{end}}
     }
+
+    upstream kong-8001 {
+        least_conn;
+        {{range service "kong"}}
+        server {{.Address}}:8001 max_fails=3 fail_timeout=60 weight=1;{{end}}
+    }
+
+    server {
+        listen 8000;
+        location / {
+            proxy_pass http://kong-8000;
+        }
+    }
+
+    server {
+        listen 8001;
+        location / {
+            proxy_pass http://kong-8001;
+        }
+    }
+
+    include /etc/nginx/conf.d/*.conf;
 }
 
-server {
-	listen 8001;
-	location / {
-        proxy_pass http://kong-8001;
+stream {
+    upstream kong-8443 {
+        least_conn;
+        {{range service "kong"}}
+        server {{.Address}}:8443 max_fails=3 fail_timeout=60 weight=1;{{end}}
+    }
+
+    server {
+        listen 8443;
+        proxy_pass kong-8443;
     }
 }

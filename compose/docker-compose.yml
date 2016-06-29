@@ -25,7 +25,9 @@ services:
       - 7946/udp
     environment:
       - DATABASE=postgres
-      - SERVICE_NAME=kong
+      - SERVICE_8000_NAME=kong
+      - SERVICE_8001_NAME=kong
+      - SERVICE_8443_NAME=kong
 
   consul:
     image: progrium/consul
