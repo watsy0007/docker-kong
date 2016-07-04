@@ -3,6 +3,7 @@ postgres:
   port: 5432
   database: kong
   user: kong
+  password: kong
 cassandra:
   contact_points:
     - "kong-database:9042"
