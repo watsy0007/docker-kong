@@ -14,7 +14,7 @@ if [ -n "$DB_PORT" ]; then
 fi
 
 if [ -n "$DB_NAME" ]; then
-    reg="4,4s/kong/${DB_USER}/"
+    reg="4,4s/kong/${DB_NAME}/"
     echo $reg
     echo `(sed -i  $reg /etc/kong/kong.yml)`
 fi
